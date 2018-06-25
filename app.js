@@ -1,8 +1,12 @@
 const express = require("express");
+const bodyParser = require("body-parser");
 
 const app = express();
 
 app.use(express.static(__dirname + "/public"));
+
+// Allow our app to create "req.body" for POST form submissions
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.set("view engine", "hbs");
 
@@ -14,11 +18,14 @@ app.get("/", (req, res, next) => {
 });
 
 app.get("/results", (req, res, next) => {
+  // const search_query = req.query.search_query;
+  const { search_query } = req.query;
+
   // req.query -> query string
-  if (req.query.search_query === "grape") {
+  if (search_query === "grape") {
     res.send("<h1>🍇</h1>");
   }
-  else if (req.query.search_query === "ananas") {
+  else if (search_query === "ananas") {
     res.send("<h1>🍍</h1>");
   }
   else {
@@ -29,11 +36,14 @@ app.get("/results", (req, res, next) => {
 //  /en/courses/webdev
 //  /fr/courses/ux-ui
 app.get("/:lang/courses/:course", (req, res, next) => {
+  // const lang = req.params.lang;
+  const { lang, course } = req.params;
+
   // req.params -> URL parameters
-  if (req.params.lang === "fr") {
+  if (lang === "fr") {
     res.send("Rejoignez la prochaine génération de créateurs du digital");
   }
-  else if (req.params.lang === "pt") {
+  else if (lang === "pt") {
     res.send("Preparando a próxima geração de produtores digitais");
   }
   else {
@@ -46,8 +56,17 @@ app.get("/login", (req, res, next) => {
 });
 
 app.post("/process-login", (req, res, next) => {
-  // Express doesn't create "req.body" automatically! ☹️
-  res.send(req.body);
+  // const userEmail = req.body.userEmail;
+  // const userPassword = req.body.userPassword;
+  const { userEmail, userPassword } = req.body;
+
+  // the "body-parser" package creates "req.body"
+  if (userEmail === "yoda@master.com" && userPassword === "hmmm") {
+    res.render("welcome.hbs");
+  }
+  else {
+    res.render("gtfo.hbs");
+  }
 });
 
 
